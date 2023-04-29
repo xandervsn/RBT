@@ -1,6 +1,6 @@
 /* Xander Siruno-Nebel
-   C++/Data Structures
-   Galbraith
+   C++/Data Structures, Galbraith
+   4/29/23
    RBT: implementation of a red black tree in C++
  */
 

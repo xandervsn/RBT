@@ -40,25 +40,25 @@ void tree::checkadd(node* current, node*& root) {
       }
     }
   }
-  // Case 1
+  //case 1a
   if(current == root) {
     current->isred = false;
     return;
   }
-  // Case 2
+  //case 1b
   else if(parent != NULL && !parent->isred) {
     return;
   }
-  // Case 3
+  //triangle case
   else if(uncle != NULL && parent->isred && uncle->isred) {
     parent->isred = false;
     uncle->isred = false;
     grandparent->isred = true;
     checkadd(grandparent, root);
   }
-  // Try else if if this does not work
+  //triangle case 2
   else if(uncle == NULL || !uncle->isred) {
-    // Case 4
+    //case 2a
     if(parent == grandparent->right && current == parent->left) {
       grandparent->right = current;
       current->parent = grandparent;
@@ -73,6 +73,7 @@ void tree::checkadd(node* current, node*& root) {
       current = parent->right;
       current->parent = parent;
     }else if(parent == grandparent->left && current == parent->right) {
+      //cast 2b
       grandparent->left = current;
       current->parent = grandparent;
       node *temp = current->left;
@@ -86,11 +87,12 @@ void tree::checkadd(node* current, node*& root) {
       current = parent->left;
       current->parent = parent;
     }
-    // Case 5
     if(parent->isred && current->isred) {
+      //line case
       node* greatgrandparent = NULL;
       if(grandparent->left == parent && parent->left == current) {
-    	node* temp = parent->right;
+	//case 3a
+	node* temp = parent->right;
     	parent->right = grandparent;
     	if(grandparent != root){
 	  greatgrandparent = grandparent->parent;
@@ -112,7 +114,8 @@ void tree::checkadd(node* current, node*& root) {
     	parent->isred = false;
     	grandparent->isred = true;
       }else if(grandparent->right == parent && parent->right == current) {
-    	node* temp = parent->left;
+	//case 3b
+	node* temp = parent->left;
     	parent->left = grandparent;
     	if(grandparent != root) {
 	  greatgrandparent = grandparent->parent;
@@ -138,8 +141,8 @@ void tree::checkadd(node* current, node*& root) {
   }
 }
 
-void tree::add(node* current, node* n, int input, node*& root) {
-  if (current->right != NULL && input > current->data) {
+void tree::add(node* current, node* n, int input, node*& root) { //bst add
+  if(current->right != NULL && input > current->data) {
     add(current->right, n, input, root);
   }else if (current->left != NULL && input <= current->data) {
     add(current->left, n, input, root);
@@ -178,6 +181,7 @@ void tree::display(node* root, int buffer){
 }
 
 void tree::display2(node* current, node* root, int buffer){
+  //covering bases
   if(current == NULL){
     return;
   }
