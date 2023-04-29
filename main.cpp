@@ -14,11 +14,12 @@ int main(){
   srand(time(0));
 
   while(true){
-    cout << "Please enter a valid command (ADD, READ, PRINT)." << endl;
+    cout << "Please enter a valid command (ADD, READ, PRINT, QUIT)." << endl;
     char command[10];
     int input = 0;
     cin >> command;
     if(strcmp(command, "PRINT") == 0){
+      bst.display2(bst.root, bst.root, 0);
       bst.display(bst.root, 0);
     }else if(strcmp(command, "FIND") == 0){
       cout << "What number to find?" << endl;
@@ -28,7 +29,14 @@ int main(){
       cout << "Input number to add:" << endl;
       int in2 = 0;
       cin >> in2;
-      bst.add(in2, bst.root);
+      node* n = new node();
+      n->data = in2;
+      if(bst.root == NULL){
+	bst.root = n;
+	bst.checkadd(n, bst.root);
+      }else{
+	bst.add(bst.root, n, in2, bst.root);
+      }
     }else if(strcmp(command, "READ") == 0){
       ifstream File;
       File.open("nums.txt");
@@ -40,9 +48,18 @@ int main(){
       cout << "How many numbers to read in?" << endl;
       cin >> input;
       for(int i = 0; i < input; i++){
-	int random = rand() % 999;
-	bst.add(numbers[random], bst.root);
+	int random = numbers[i];
+	node* n = new node();
+	n->data = random;
+	if(bst.root == NULL){
+	  bst.root = n;
+	  bst.checkadd(n, bst.root);
+	}else{
+	  bst.add(bst.root, n, random, bst.root);
+	}	
       }
+    }else if(strcmp(command, "QUIT") == 0){
+      break;
     }
   }
   return 0;

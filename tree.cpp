@@ -25,65 +25,137 @@ void tree::find(int input, node* &current){
   }
 }
 
-void tree::checkadd(node* &current){
-  if(current == root){
-    //current is root
-    return;
-  }else if(!current->parent || !current->parent->parent){
-    //current does not have an uncle
-    return;
-  }else{
-    //sees if parent is left or right child, sets unc as opposite
-    current->grandparent = current->parent->parent;
-    if(current->parent == current->grandparent->left){
-      current->uncle = current->right;
-    }else if(current->parent == current->grandparent->right){
-      current->uncle = current->left;
+void tree::checkadd(node* current, node*& root) {
+  cout << "here" << endl;
+  node* parent = NULL;
+  node* grandparent = NULL;
+  node* uncle = NULL;
+  if (current->parent != NULL) {
+    parent = current->parent;
+    if (parent->parent != NULL) {
+      grandparent = parent->parent;
+      if (grandparent->left == parent) {
+    	uncle = grandparent->right;
+      } else if (grandparent->right == parent) {
+    	uncle = grandparent->left;
+      }
     }
-
-    if(current->uncle->isred){
-      
-    }else if(!current->uncle->isred){
-      cout << "a" << endl;
-      if((current->parent->left == current && current->grandparent->right == current->parent) ||
-	 (current->parent->right == current && current->grandparent->left == current->parent)){
-	int temp = current->data;
-	current->data = current->parent->data;
-	current->parent->data = temp;
+  }
+  // Case 1
+  if(current == root) {
+    current->isred = false;
+    return;
+  }
+  // Case 2
+  else if(parent != NULL && !parent->isred) {
+    return;
+  }
+  // Case 3
+  else if(uncle != NULL && parent->isred && uncle->isred) {
+    parent->isred = false;
+    uncle->isred = false;
+    grandparent->isred = true;
+    checkadd(grandparent, root);
+  }
+  // Try else if if this does not work
+  else if(uncle == NULL || !uncle->isred) {
+    // Case 4
+    if(parent == grandparent->right && current == parent->left) {
+      grandparent->right = current;
+      current->parent = grandparent;
+      node *temp = current->right;
+      current->right = parent;
+      parent->parent = current;
+      if(temp != NULL){
+    	temp->parent = parent;
+      }
+      parent->left = temp;
+      parent = current;
+      current = parent->right;
+      current->parent = parent;
+    }else if(parent == grandparent->left && current == parent->right) {
+      grandparent->left = current;
+      current->parent = grandparent;
+      node *temp = current->left;
+      current->left = parent;
+      parent->parent = current;
+      if(temp != NULL) {
+    	temp->parent = parent;
+      }
+      parent->right = temp;
+      parent = current;
+      current = parent->left;
+      current->parent = parent;
+    }
+    // Case 5
+    if(parent->isred && current->isred) {
+      node* greatgrandparent = NULL;
+      if(grandparent->left == parent && parent->left == current) {
+    	node* temp = parent->right;
+    	parent->right = grandparent;
+    	if(grandparent != root){
+	  greatgrandparent = grandparent->parent;
+	  if(greatgrandparent->left == grandparent) {
+	    greatgrandparent->left = parent;
+	  }else{
+	    greatgrandparent->right = parent;
+	  }
+	  parent->parent = greatgrandparent;
+    	}else{
+	  parent->parent = NULL;
+	  root = parent;
+    	}
+    	grandparent->parent = parent;
+    	if(temp != NULL) {
+	  temp->parent = grandparent;
+    	}
+    	grandparent->left = temp;
+    	parent->isred = false;
+    	grandparent->isred = true;
+      }else if(grandparent->right == parent && parent->right == current) {
+    	node* temp = parent->left;
+    	parent->left = grandparent;
+    	if(grandparent != root) {
+	  greatgrandparent = grandparent->parent;
+	  if(greatgrandparent->left == grandparent) {
+	    greatgrandparent->left = parent;
+	  }else{
+	    greatgrandparent->right = parent;
+	  }
+	  parent->parent = greatgrandparent;
+    	}else{
+	  parent->parent = NULL;
+	  root = parent;
+    	}
+    	grandparent->parent = parent;
+    	if(temp != NULL){
+	  temp->parent = grandparent;
+    	}
+    	grandparent->right = temp;
+    	parent->isred = false;
+    	grandparent->isred = true;
       }
     }
   }
 }
 
-void tree::add(int input, node* &current){
-  node* n = new node();
-  n->data = input;
-  n->parent = current;
-  n->isred = true;
-  n->left = new node();
-  n->left->isred = false;
-  n->right = new node();
-  n->right->isred = false;
-  //slightly tweaked code from find
-  if(root == NULL){
-    root = n;
-    n->isred = false;
-  }else{
-    if(input < current->data){
-      if(current->left->data == 0){
-	current->left = n;
-	checkadd(current->left);
-      }else{
-	add(input, current->left);
-      }
-    }else if(input > current->data){
-      if(current->right->data == 0){
-	current->right = n;
-      }else{
-	add(input, current->right);
-      }
+void tree::add(node* current, node* n, int input, node*& root) {
+  if (current->right != NULL && input > current->data) {
+    add(current->right, n, input, root);
+  }else if (current->left != NULL && input <= current->data) {
+    add(current->left, n, input, root);
+  } else {
+    if (input > current->data) {
+      n->parent = current;
+      current->right = n;
+      checkadd(current->right, root);
     }
-  }		  
+    if (input <= current->data) {
+      n->parent = current;
+      current->left = n;
+      checkadd(current->left, root);
+    }
+  }
 }
 
 void tree::display(node* root, int buffer){
@@ -98,10 +170,25 @@ void tree::display(node* root, int buffer){
   for (int i = 5; i < buffer; i++){
     cout << " ";
   }
-  cout << root->data << "\n";
+  if(root->isred){
+    cout << "R" << root->data << endl;
+  }else{
+    cout << "B" << root->data << endl;
+  }
   display(root->left, buffer);
+}
+
+void tree::display2(node* current, node* root, int buffer){
+  if(current == NULL){
+    return;
+  }
+  buffer += 5;
+  display2(current->right, root, buffer);
+  checkadd(current, root);
+  display2(current->left, root, buffer);
 }
 
 tree::tree() {
   root = NULL;
 }
+

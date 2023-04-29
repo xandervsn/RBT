@@ -11,7 +11,7 @@ struct node
   node* left;
   node* right;
   node* parent;
-  bool isred;
+  bool isred = true;
   //only to be used for rotation
   node* grandparent;
   node* uncle;
@@ -24,11 +24,10 @@ public:
   //~tree();        //supplied
   void build();   //supplied
   void display(node*, int); //supplied
-  void add(int, node*&);
-  void checkadd(node*&);
+  void display2(node*, node*, int);
+  void add(node*, node*, int, node*&);
+  void checkadd(node*, node*&);
   void find(int, node*&);
-  void Lrotate();
-  void Rrotate();
   node* root;
   bool isred;
 };
