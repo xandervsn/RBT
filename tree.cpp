@@ -26,7 +26,6 @@ void tree::find(int input, node* &current){
 }
 
 void tree::checkadd(node* current, node*& root) {
-  cout << "here" << endl;
   node* parent = NULL;
   node* grandparent = NULL;
   node* uncle = NULL;

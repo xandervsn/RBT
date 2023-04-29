@@ -11,10 +11,7 @@ struct node
   node* left;
   node* right;
   node* parent;
-  bool isred = true;
-  //only to be used for rotation
-  node* grandparent;
-  node* uncle;
+  bool isred;
 };
 
 class tree

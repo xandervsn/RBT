@@ -31,6 +31,7 @@ int main(){
       cin >> in2;
       node* n = new node();
       n->data = in2;
+      n->isred = true;
       if(bst.root == NULL){
 	bst.root = n;
 	bst.checkadd(n, bst.root);
@@ -51,6 +52,7 @@ int main(){
 	int random = numbers[i];
 	node* n = new node();
 	n->data = random;
+	n->isred = true;
 	if(bst.root == NULL){
 	  bst.root = n;
 	  bst.checkadd(n, bst.root);
