@@ -39,8 +39,10 @@ int main(){
 	bst.add(bst.root, n, in2, bst.root);
       }
     }else if(strcmp(command, "READ") == 0){
+      cout << "Enter file name (include file extension):" << endl;
+      cin >> command;
       ifstream File;
-      File.open("nums.txt");
+      File.open(command);
       vector<int>numbers;
       int number;
       while(File >> number){
@@ -48,17 +50,48 @@ int main(){
       }
       cout << "How many numbers to read in?" << endl;
       cin >> input;
-      for(int i = 0; i < input; i++){
-	int random = numbers[i];
-	node* n = new node();
-	n->data = random;
-	n->isred = true;
-	if(bst.root == NULL){
-	  bst.root = n;
-	  bst.checkadd(n, bst.root);
-	}else{
-	  bst.add(bst.root, n, random, bst.root);
-	}	
+      cout << "In what order? (FRONT, BACK, RAND)" << endl;
+      cin >> command;
+      if(strcmp(command, "FRONT") == 0){
+	for(int i = 0; i < input; i++){
+	  int random = numbers[i];
+	  node* n = new node();
+	  n->data = random;
+	  n->isred = true;
+	  if(bst.root == NULL){
+	    bst.root = n;
+	    bst.checkadd(n, bst.root);
+	  }else{
+	    bst.add(bst.root, n, random, bst.root);
+	  }
+	}
+      }else if(strcmp(command, "BACK") == 0){
+	for(int i = numbers.size(); i > numbers.size() - input; i--){
+	  int random = numbers[i];
+          node* n = new node();
+          n->data = random;
+          n->isred = true;
+          if(bst.root == NULL){
+            bst.root = n;
+            bst.checkadd(n, bst.root);
+          }else{
+            bst.add(bst.root, n, random, bst.root);
+          }
+	}
+      }else if(strcmp(command, "RAND") == 0){
+        for(int i = 0; i < input; i++){
+	  int rnd = rand() % 999;
+          int random = numbers[rnd];
+          node* n = new node();
+          n->data = random;
+          n->isred = true;
+          if(bst.root == NULL){
+            bst.root = n;
+            bst.checkadd(n, bst.root);
+          }else{
+            bst.add(bst.root, n, random, bst.root);
+          }
+        }
       }
     }else if(strcmp(command, "QUIT") == 0){
       break;
