@@ -1,28 +1,27 @@
 #include "tree.h"
 
-void tree::find(int input, node* &current){
-  if(input == current-> data){
-    cout << "Input found!" << endl;
-    return;
-  }else if(root == NULL){
-    cout << "This BST is empty! " << endl;
-    return;
+int tree::find(int input, node* &current, int& tester){
+  if(input == current->data || tester > 0){
+    cout << tester << endl;
+    tester++;
+    return tester;
   }
   if(input < current->data){
     //less, left
     if(current->left->data != 0){
-      find(input, current->left);
+      find(input, current->left, tester);
     }
   }else if(input > current->data){
     //high, right
     if(current->right->data != 0){
-      find(input, current->right);
+      find(input, current->right, tester);
     }
   }
   if(current->left->data != 0 && current->right->data != 0){
-    cout << "Input NOT found." << endl;
-    return;
+    cout << tester << endl;
+    return tester;
   }
+  return tester;
 }
 
 void tree::checkadd(node* current, node*& root) {

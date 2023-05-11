@@ -24,7 +24,7 @@ public:
   void display2(node*, node*, int);
   void add(node*, node*, int, node*&);
   void checkadd(node*, node*&);
-  void find(int, node*&);
+  int find(int, node*&, int&);
   node* root;
   bool isred;
 };

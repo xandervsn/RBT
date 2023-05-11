@@ -24,7 +24,16 @@ int main(){
     }else if(strcmp(command, "FIND") == 0){
       cout << "What number to find?" << endl;
       cin >> input;
-      bst.find(input, bst.root);
+      if(bst.root){
+	int tester = 0;
+	if(bst.find(input, bst.root, tester) > 0){
+	  cout << "Number found" << endl;
+	}else{
+	  cout << "Number NOT found." << endl;
+	}
+      }else{
+	cout << "This tree is empty!" << endl;
+      }
     }if(strcmp(command, "ADD") == 0){
       cout << "Input number to add:" << endl;
       int in2 = 0;
