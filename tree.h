@@ -25,6 +25,8 @@ public:
   void add(node*, node*, int, node*&);
   void checkadd(node*, node*&);
   int find(int, node*&, int&);
+  void dlt(node*&, node*&);
+  void checkdlt(node*, node*&, node*&);
   node* root;
   bool isred;
 };

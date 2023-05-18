@@ -14,7 +14,7 @@ int main(){
   srand(time(0));
 
   while(true){
-    cout << "Please enter a valid command (ADD, READ, PRINT, QUIT)." << endl;
+    cout << "Please enter a valid command (ADD, READ, PRINT, QUIT, DLT)." << endl;
     char command[10];
     int input = 0;
     cin >> command;
@@ -104,6 +104,17 @@ int main(){
       }
     }else if(strcmp(command, "QUIT") == 0){
       break;
+    }else if(strcmp(command, "DLT") == 0){
+      node* todelete;
+      cout << "Input number to delete:" << endl;
+      int input = 0;
+      cin >> input;
+      int tester = 0;
+      if(bst.find(input, bst.root, tester) > 0 && bst.root){
+	dlt(bst.root, todelete);
+      }else{
+	cout << "This number is not contained in the tree!" << endl;
+      }
     }
   }
   return 0;
