@@ -11,6 +11,7 @@
 
 int main(){
   tree bst;
+  node* root = NULL;
   node* newptr = NULL;
   srand(time(0));
 
@@ -20,13 +21,13 @@ int main(){
     int input = 0;
     cin >> command;
     if(strcmp(command, "PRINT") == 0){
-      bst.display2(bst.root, bst.root, 0);
-      bst.display(bst.root, 0);
+      bst.display2(root, root, 0);
+      bst.display(root, 0);
     }else if(strcmp(command, "FIND") == 0){
       cout << "Input number to find:" << endl;
       int input = 0;
       cin >> input;
-      if(bst.search(bst.root, input, newptr)){
+      if(bst.search(root, input, newptr)){
 	cout << "Input found!" << endl;
       }else{
 	cout << "Input NOT found." << endl;
@@ -38,11 +39,11 @@ int main(){
       node* n = new node();
       n->data = in2;
       n->isred = true;
-      if(bst.root == NULL){
-	bst.root = n;
-	bst.checkadd(n, bst.root);
+      if(root == NULL){
+	root = n;
+	bst.checkadd(n, root);
       }else{
-	bst.add(bst.root, n, in2, bst.root);
+	bst.add(root, n, in2, root);
       }
     }else if(strcmp(command, "READ") == 0){
       cout << "Enter file name (include file extension):" << endl;
@@ -64,11 +65,11 @@ int main(){
 	  node* n = new node();
 	  n->data = random;
 	  n->isred = true;
-	  if(bst.root == NULL){
-	    bst.root = n;
-	    bst.checkadd(n, bst.root);
+	  if(root == NULL){
+	    root = n;
+	    bst.checkadd(n, root);
 	  }else{
-	    bst.add(bst.root, n, random, bst.root);
+	    bst.add(root, n, random, root);
 	  }
 	}
       }else if(strcmp(command, "BACK") == 0){
@@ -77,11 +78,11 @@ int main(){
           node* n = new node();
           n->data = random;
           n->isred = true;
-          if(bst.root == NULL){
-            bst.root = n;
-            bst.checkadd(n, bst.root);
+          if(root == NULL){
+            root = n;
+            bst.checkadd(n, root);
           }else{
-            bst.add(bst.root, n, random, bst.root);
+            bst.add(root, n, random, root);
           }
 	}
       }else if(strcmp(command, "RAND") == 0){
@@ -91,11 +92,11 @@ int main(){
           node* n = new node();
           n->data = random;
           n->isred = true;
-          if(bst.root == NULL){
-            bst.root = n;
-            bst.checkadd(n, bst.root);
+          if(root == NULL){
+            root = n;
+            bst.checkadd(n, root);
           }else{
-            bst.add(bst.root, n, random, bst.root);
+            bst.add(root, n, random, root);
           }
         }
       }
@@ -105,7 +106,7 @@ int main(){
       cout << "Input number to remove:" << endl;
       int input = 0;
       cin >> input;
-      bst.remove(bst.root, bst.root, input, newptr);
+      bst.remove(root, root, input, newptr);
     }
   }
   return 0;

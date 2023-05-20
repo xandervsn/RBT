@@ -27,6 +27,5 @@ public:
   void remove(node*&, node*, int, node*);
   bool search(node *, int, node *&);
   void checkDelete(node *curr, node *&root);
-  node* root;
   bool isred;
 };

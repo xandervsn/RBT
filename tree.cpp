@@ -21,9 +21,9 @@ bool tree::search(node* curr, int num, node* &newptr) {//Search Function
 }
 
 void tree::checkDelete(node* curr, node* &root) {//Check delete function which has cases for double blacks
-  cout << "1" << endl;
+  cout << "0" << endl;
   node* sibling = NULL;
-  if (curr == root) {//CASE 1
+  if (!curr->parent) {//CASE 1
     cout << "case 1" << endl;
     return;
   }
@@ -38,18 +38,25 @@ void tree::checkDelete(node* curr, node* &root) {//Check delete function which h
     }
     if (sibling != NULL) {
       //CASE 2
-      if (sibling->isred == true && curr == curr->parent->left && curr->isred == false && parent->isred == false) {//Rotates the sibling through the parent
+      cout << "2" << endl;
+      if (sibling->isred == true && curr == curr->parent->left && curr->isred == false && parent->isred == false) {
+	cout << "2a" << endl;
 	node* siblingLeft = sibling->left;
 	sibling->parent = parent->parent;
 	if (parent != root) {
+	  cout << "2b" << endl;
 	  if (parent == parent->left) {
+	    cout << "2c" << endl;
 	    parent->parent->left = sibling;
 	  }
 	  else {
+	    cout << "2d" << endl;
 	    parent->parent->right = sibling;
 	  }
   	}
 	else {
+	  cout << "2e" << endl;
+	  cout << root->data << endl;
 	  root = sibling;
 	}
 	sibling->left = parent;
@@ -58,11 +65,13 @@ void tree::checkDelete(node* curr, node* &root) {//Check delete function which h
 	sibling->isred = false;
 	parent->right = siblingLeft;
 	if (siblingLeft != NULL) {
+	  cout << "2f" << endl;
 	  siblingLeft->parent = parent;
 	}
 	sibling = parent->right;//Resets sibling
       }
       else if (sibling->isred == true && curr == curr->parent->right && curr->isred == false && parent->isred == false) {//Rotates sibling through parent
+	
 	node* siblingRight = sibling->right;
 	sibling->parent = parent->parent;
 	if (parent != root) {
@@ -86,22 +95,27 @@ void tree::checkDelete(node* curr, node* &root) {//Check delete function which h
 	}
 	node* temporary = sibling;
 	sibling = parent->left;//Resets sibling
+      }else{
+	cout << "2aaa" << endl;
       }
- 	 
     
       //CASE 3
       if (sibling->isred == false && curr->isred == false && parent->isred == false && (sibling->left == NULL || sibling->left->isred == false) && (sibling->right == NULL || sibling->right->isred == false)) {//Sets siblings isred to red then recurcive call on parent
+	cout << "3" << endl;
 	sibling->isred = true;
 	checkDelete(parent, root);
       }
+      
       //CASE 4
       else if (parent->isred == true && sibling->isred == false && (sibling->left == NULL || sibling->left->isred == false) && (sibling->right == NULL || sibling->right->isred == false)) {//Sets parent to black and sibling to red
+	cout << "4:" << parent->data << endl;
 	parent->isred = false;
 	sibling->isred = true;
 	return;
       }
       //CASE 5
       else if (parent->left == sibling && (sibling->left == NULL || sibling->left->isred == false)) {//Rotates through sibling
+	cout << "5" << endl;
 	if (sibling->right != NULL) {
 	  if (sibling->right->isred == true) {//If siblings right is red
 	    node* siblingRight = sibling->right;//Rotates trhough sibling
@@ -137,6 +151,7 @@ void tree::checkDelete(node* curr, node* &root) {//Check delete function which h
       }
       //CASE 6
       if (sibling->isred == false && parent->left == sibling && sibling->left != NULL && curr->isred == false) {//Rotates through parent and switchs parent and siblings isreds
+	cout << "6" << endl;
 	if (sibling->left->isred == true) {
 	  node* temp = sibling->right;
 	  sibling->right = parent;
@@ -224,6 +239,7 @@ void tree::remove(node* &root, node* curr, int num, node* newptr) {//Removes the
 	newPos = root;
       }
       else {//If it has two children
+	cout << "A" << endl;
 	node* newnode = temp->right;
     	while (newnode->left != NULL) {//Goes to inorder sucser
 	  newnode = newnode->left;
@@ -518,13 +534,17 @@ void tree::display(node* root, int buffer){
   for (int i = 5; i < buffer; i++){
     cout << " ";
   }
-  if(root->isred){
-    cout << "R" << root->data << endl;
+  if(root->parent){
+    if(root->isred){
+      cout << "R" << root->data << endl;
+    }else{
+      cout << "B" << root->data << endl;
+    }
   }else{
     cout << "B" << root->data << endl;
   }
   display(root->left, buffer);
-}
+  }
 
 void tree::display2(node* current, node* root, int buffer){
   //covering bases
@@ -538,6 +558,5 @@ void tree::display2(node* current, node* root, int buffer){
 }
 
 tree::tree() {
-  root = NULL;
 }
 
