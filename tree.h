@@ -24,9 +24,9 @@ public:
   void display2(node*, node*, int);
   void add(node*, node*, int, node*&);
   void checkadd(node*, node*&);
-  int find(int, node*&, int&);
-  void dlt(node*&, node*&);
-  void checkdlt(node*, node*&, node*&);
+  void remove(node*&, node*, int, node*);
+  bool search(node *, int, node *&);
+  void checkDelete(node *curr, node *&root);
   node* root;
   bool isred;
 };

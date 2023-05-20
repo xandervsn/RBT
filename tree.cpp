@@ -1,342 +1,375 @@
 #include "tree.h"
 
-void tree::checkdlt(node *curr, node *&root, node *&goaln) {
-  node *sibling = NULL;
-  node *parent = NULL;
-  node *grandparent = NULL;
-  if (curr->parent != NULL) {
-    parent = curr->parent;
-    if (parent->left == curr && parent->right != NULL) {
-      sibling = parent->right;
-    } else if (parent->right == curr && parent->left != NULL) {
-      sibling = parent->left;
+bool tree::search(node* curr, int num, node* &newptr) {//Search Function
+  bool b = false;
+  if (curr->data == num) {
+    newptr = curr;
+    return true;
+  }
+  else {
+    if (curr->data > num && curr->left != NULL) {
+      b = search(curr->left, num, newptr);
     }
-    if (parent->parent != NULL) {
-      grandparent = parent->parent;
+    else if (curr->data < num && curr->right != NULL) {
+      b = search(curr->right, num, newptr);
+    }
+    if(b) {
+      return true;
     }
   }
-  // CASE 1
-  if (curr == root) {
-    if (curr->right == NULL) {
-      root = curr->left;
-      delete goaln;
-    } else {
-      root = curr->right;
-      delete goaln;
-    }
+  return false;
+}
+
+void tree::checkDelete(node* curr, node* &root) {//Check delete function which has cases for double blacks
+  cout << "1" << endl;
+  node* sibling = NULL;
+  if (curr == root) {//CASE 1
+    cout << "case 1" << endl;
+    return;
   }
-  // CASE 2
-  if (sibling->color) {
-    if (parent->right == curr) {
-      sibling->color = false;
-      parent->color = true;
-      parent->right = sibling->left;
-      sibling->left->parent = parent;
-      sibling->left = parent;
-      parent->parent = sibling;
-      if (grandparent != NULL) {
-	if (grandparent->right == parent) {
-	  grandparent->right = sibling;
-	} else {
-	  grandparent->left = sibling;
+  else {
+    //Sets up varubles
+    node* parent = curr->parent;
+    if (curr == curr->parent->right) {
+      sibling = curr->parent->left;
+    }
+    else if (curr == curr->parent->left) {
+      sibling = curr->parent->right;
+    }
+    if (sibling != NULL) {
+      //CASE 2
+      if (sibling->isred == true && curr == curr->parent->left && curr->isred == false && parent->isred == false) {//Rotates the sibling through the parent
+	node* siblingLeft = sibling->left;
+	sibling->parent = parent->parent;
+	if (parent != root) {
+	  if (parent == parent->left) {
+	    parent->parent->left = sibling;
+	  }
+	  else {
+	    parent->parent->right = sibling;
+	  }
+  	}
+	else {
+	  root = sibling;
 	}
-	sibling->parent = grandparent;
-      } else {
-	root = sibling;
+	sibling->left = parent;
+	parent->parent = sibling;
+	parent->isred = true;//changes isreds
+	sibling->isred = false;
+	parent->right = siblingLeft;
+	if (siblingLeft != NULL) {
+	  siblingLeft->parent = parent;
+	}
+	sibling = parent->right;//Resets sibling
       }
-    } else {
-      sibling->color = false;
-      parent->color = true;
-      parent->left = sibling->right;
-      sibling->right->parent = parent;
-      sibling->right = parent;
-      parent->parent = sibling;
-      if (grandparent != NULL) {
-	if (grandparent->right == parent) {
-	  grandparent->right = sibling;
-	} else {
-	  grandparent->left = sibling;
-    }
-	sibling->parent = grandparent;
-      } else {
-	root = sibling;
+      else if (sibling->isred == true && curr == curr->parent->right && curr->isred == false && parent->isred == false) {//Rotates sibling through parent
+	node* siblingRight = sibling->right;
+	sibling->parent = parent->parent;
+	if (parent != root) {
+	  if (parent == parent->left) {
+	    parent->parent->left = sibling;
+	  }
+	  else {
+	    parent->parent->right = sibling;
+	  }
+	}
+	else {
+	  root = sibling;
+	}
+	sibling->right = parent;
+	parent->parent = sibling;
+	parent->isred = true;//Changes isreds
+	sibling->isred = false;
+	parent->left = siblingRight;
+	if (siblingRight != NULL) {
+	  siblingRight->parent = parent;
+	}
+	node* temporary = sibling;
+	sibling = parent->left;//Resets sibling
       }
-    }
-    if (curr->parent != NULL) {
-      parent = curr->parent;
-      if (parent->left == curr && parent->right != NULL) {
-	sibling = parent->right;
-      } else if (parent->right == curr && parent->left != NULL) {
-	sibling = parent->left;
-      }
-      if (parent->parent != NULL) {
-	grandparent = parent->parent;
-      }
-    }
+ 	 
     
-    // CASE 3
-    if (!sibling->color) {
-      sibling->color = true;
-      checkdlt(parent, root, goaln);
-    }
-    // CASE 4
-    else if (
-	     parent->color && !sibling->color &&
-	     (sibling->left == NULL || !sibling->left->color) &&
-	     (sibling->right == NULL || !sibling->right->color)) {
-      parent->color = false;
-      sibling->color = true;
-    }
-    // Case 5
-    else if (
-	     (!sibling->color &&
-	      (sibling->left == NULL || !sibling->left->color) &&
-	      sibling->right->color && parent->right == curr) ||
-	     (!sibling->color &&
-	      (sibling->right == NULL || !sibling->right->color) &&
-	      sibling->left->color && parent->left == curr)) {
-      if (parent->right == curr) {
-	node *temp = sibling->right->left;
-	sibling->right->color = false;
-	sibling->color = true;
-	parent->left = sibling->right;
-	sibling->right->parent = parent;
-	sibling->right->left = sibling;
-	sibling->parent = sibling->right;
-	sibling->right = temp;
-      } else {
-	node *temp = sibling->left->right;
-	sibling->right->color = false;
-	sibling->color = true;
-	parent->right = sibling->left;
-	sibling->left->parent = parent;
-	sibling->left->right = sibling;
-	sibling->parent = sibling->left;
-	sibling->left = temp;
+      //CASE 3
+      if (sibling->isred == false && curr->isred == false && parent->isred == false && (sibling->left == NULL || sibling->left->isred == false) && (sibling->right == NULL || sibling->right->isred == false)) {//Sets siblings isred to red then recurcive call on parent
+	sibling->isred = true;
+	checkDelete(parent, root);
       }
-    }
-    // CASE 6
-    else {
-      if ((!sibling->color && sibling->left->color &&
-	   parent->right == curr) ||
-	  (!sibling->color && sibling->right->color &&
-	   parent->left == curr)) {
-	sibling->color = parent->color;
-	parent->color = false;
-	if (parent->right == curr) {
-	  node *temp = sibling->right;
-	  sibling->left->color = false;
+      //CASE 4
+      else if (parent->isred == true && sibling->isred == false && (sibling->left == NULL || sibling->left->isred == false) && (sibling->right == NULL || sibling->right->isred == false)) {//Sets parent to black and sibling to red
+	parent->isred = false;
+	sibling->isred = true;
+	return;
+      }
+      //CASE 5
+      else if (parent->left == sibling && (sibling->left == NULL || sibling->left->isred == false)) {//Rotates through sibling
+	if (sibling->right != NULL) {
+	  if (sibling->right->isred == true) {//If siblings right is red
+	    node* siblingRight = sibling->right;//Rotates trhough sibling
+	    parent->left = siblingRight;
+	    siblingRight->parent = parent;
+	    node* temp = siblingRight->left;
+	    siblingRight->left = sibling;
+	    sibling->parent = siblingRight;
+	    sibling->right = temp;
+	    temp->parent = sibling;
+	    sibling->isred = true;//Sets isreds
+	    siblingRight->isred = false;
+	    sibling = siblingRight;//Resets sibling
+	  }
+	}
+      }
+      else if (parent->right == sibling && (sibling->right == NULL || sibling->right->isred == false)) {
+	if (sibling->left != NULL) {
+	  if (sibling->left->isred == true) {
+	    node* siblingLeft = sibling->left;//Rotates through sibling
+	    parent->right = siblingLeft;
+	    siblingLeft->parent = parent;
+	    node* temp = siblingLeft->right;
+	    siblingLeft->right = sibling;
+	    sibling->parent = siblingLeft;
+	    sibling->left = temp;
+	    temp->parent = sibling;
+	    sibling->isred = true;//Sets isreds
+	    siblingLeft->isred = false;
+	    sibling = siblingLeft;//Resets sibling
+	  }
+	}
+      }
+      //CASE 6
+      if (sibling->isred == false && parent->left == sibling && sibling->left != NULL && curr->isred == false) {//Rotates through parent and switchs parent and siblings isreds
+	if (sibling->left->isred == true) {
+	  node* temp = sibling->right;
 	  sibling->right = parent;
+	  if (parent->parent != NULL) {//Checks if parent is NULL
+	    if (parent == parent->parent->right) {
+	      parent->parent->right = sibling;
+	      sibling->parent = parent->parent;
+	    }
+	    else {
+	      parent->parent->left = sibling;
+	      sibling->parent = parent->parent;
+	    }
+	  }
+	  else {
+	    sibling->parent = NULL;
+	    root = sibling;
+	  }
 	  parent->parent = sibling;
 	  parent->left = temp;
 	  if (temp != NULL) {
 	    temp->parent = parent;
 	  }
-	  if (grandparent != NULL) {
-	    if (grandparent->right == parent) {
-	      grandparent->right = sibling;
-	    } else {
-	      grandparent->left = sibling;
+	  //Sets isreds
+	  sibling->left->isred = false;
+	  sibling->isred = parent->isred;
+	  parent->isred = false;
+	  return;
+	}
+      }
+      else if (sibling->isred == false && parent->right == sibling && sibling->right != NULL && curr->isred == false) {
+	if (sibling->right->isred == true) {
+	  node* temp = sibling->left;
+	  sibling->left = parent;
+	  if (parent->parent != NULL) {
+	    if (parent == parent->parent->right) {
+	      parent->parent->right = sibling;
+	      sibling->parent = parent->parent;
 	    }
-	    sibling->parent = grandparent;
-	  } else {
+	    else {
+	      parent->parent->left = sibling;
+	      sibling->parent = parent->parent;
+	    }
+	  }
+	  else {
+	    sibling->parent = NULL;
 	    root = sibling;
 	  }
-	} else {
-	  node *temp = sibling->left;
-	  sibling->right->color = false;
-	  sibling->left = parent;
 	  parent->parent = sibling;
 	  parent->right = temp;
 	  if (temp != NULL) {
 	    temp->parent = parent;
 	  }
-	  if (grandparent != NULL) {
-	    if (grandparent->right == parent) {
-	      grandparent->right = sibling;
-	    } else {
-	      grandparent->left = sibling;
-	    }
-	    sibling->parent = grandparent;
-	  } else {
-	    root = sibling;
-	  }
+	  //Sets isreds
+	  sibling->right->isred = false;
+	  sibling->isred = parent->isred;
+	  parent->isred = false;
+	  return;
 	}
       }
-      delete goaln;
     }
   }
 }
 
 
-void tree::dlt(node * &root, node * &todelete) {
-  bool n;
-  node *parent = todelete->parent;
-  if (todelete !=
-      root) { // If the node that is to be removed is the not the root
-    if (parent->left == todelete) {
-      n = true;
-    } else {
-      n = false;
-    } // If n is ture curr is left of parent
-  }
-  if (todelete == root) { // If there is nothing but the root remove the root
-    if (todelete->right == NULL && todelete->left == NULL) {
-      delete todelete;
-      return;
-    } else if (todelete->right != NULL && todelete->left != NULL) { // If
-      // there is
-      // a right
-      // and left
-      node* temp = todelete->right;
-      while (temp->left != NULL) {
-	temp = temp->left;
+void tree::remove(node* &root, node* curr, int num, node* newptr) {//Removes the number from the binary search tree
+  if (search(curr, num, newptr) == true) {//If the number is in the tree
+    node* temp = newptr;
+    node* newPos = NULL;
+    node* x = NULL;
+    if (temp == root) {//If thr root is the number to be deleted
+      if (temp->left == NULL && temp->right == NULL) {//If it is a leaf
+	root = NULL;
+	newptr = NULL;
       }
-      todelete->value = temp->value;
-      if(temp->right != NULL && temp != todelete->right){
-	temp->parent->left = temp->right;
-	if(temp->parent->color){
-	  temp->right->color = false;
+      else if (temp->left != NULL && temp->right == NULL) {//If it only has a left child
+	root = root->left;
+	root->parent = NULL;
+	newptr = NULL;
+	newPos = root;
+      }
+      else if (temp->left == NULL && temp->right != NULL) {//If it only has a right child
+	root = root->right;
+	root->parent = NULL;
+	newptr = NULL;
+	newPos = root;
+      }
+      else {//If it has two children
+	node* newnode = temp->right;
+    	while (newnode->left != NULL) {//Goes to inorder sucser
+	  newnode = newnode->left;
+    	}
+    	temp->data = newnode->data;
+	checkDelete(newnode, root);//Calls check delete
+    	if (newnode == temp->right) {
+	  temp->right = temp->right->right;
+    	}
+	else if(newnode->right != NULL){
+	  newnode->parent->left = newnode->right;
+	  newnode->right->parent = newnode->parent;
+	  if(newnode->parent->isred){
+	    newnode->right->isred = false;
+	  }
 	}
+	if (newnode->parent->left == newnode) {
+	  newnode->parent->left = NULL;
+	}
+	newptr = NULL;
+	newPos = root;
       }
-      if (temp->parent->left == temp) {
-	temp->parent->left = NULL;
-      }
-      if(temp == todelete->right && temp->right != NULL){
-	todelete->right = temp->right;
-	temp->right->parent = todelete;
-      }
-      delete temp;
-      return;
     }
-    if (root->right == NULL) { // If there only is a right
-      node *temp = root;
-      delete temp;
-      root = root->left;
-    } else { // If there only is a left
-      node *temp = root;
-      delete temp;
-      root = root->right;
-    }
-    root->color = false;
-  } else { // If the goal node is not the root
-    if (todelete->right == NULL &&
-	todelete->left ==
-	NULL) { // If both are null set the parents pointer that
-      // would point to the goal node to NULL
-      if (todelete->color) {
-	if (n) {
-	  delete todelete;
-	  parent->left = NULL;
-	} else {
-	  delete todelete;
-	  parent->right = NULL;
+    else {
+      if (temp->left == NULL && temp->right == NULL) {//If it is a leaf
+	if (temp->isred == true) {
+	  if (temp->parent->left == temp) {
+	    temp->parent->left = NULL;
+	    delete temp;
+	  }
+	  else {
+	    temp->parent->right = NULL;
+	    delete temp;
+	  }
+	  return;
 	}
-	return;
-      }
-      if (n) {
-	checkdlt(todelete, root, todelete);
-	parent->left = NULL;
-      } else {
-	checkdlt(todelete, root, todelete);
-	parent->right = NULL;
-      }
-      return;
-    } else if (
-	       todelete->right != NULL &&
-	       todelete->left != NULL) { // If there is a both right and left
-      node *temp = todelete->right;
-      while (temp->left != NULL) {
-	temp = temp->left;
-      }
-      todelete->value = temp->value;
-      checkdlt(temp, root, temp);
-      if (temp == todelete->right) {
-	todelete->right = todelete->right->right;
-      }
-      if (temp->parent->left == temp) {
-	temp->parent->left = NULL;
-      }
-      return;
-    } else { // If there is only one child
-      if (n) {
-	if (todelete->left == NULL) {
-	  if (todelete->right->color == !todelete->color) {
-	    delete todelete;
-	    parent->left = todelete->right;
-	    if (todelete->right->color) {
-	      todelete->color = false;
-	    }
-	    return;
-	  }
-	  parent->left = todelete->right;
-	  checkdlt(todelete, root, todelete);
-	} else {
-	  if (todelete->left->color == !todelete->color) {
-	    delete todelete;
-	    parent->left = todelete->left;
-	    if (todelete->left->color) {
-	      todelete->color = false;
-	    }
-	    return;
-	  }
-	  parent->left = todelete->left;
-	  checkdlt(todelete, root, todelete);
+	if (temp->parent->left == temp) {//Calls check delete then deletes
+	  checkDelete(temp, root);
+	  temp->parent->left = NULL;
 	}
-      } else {
-	if (todelete->left == NULL) {
-	  if (todelete->right->color == !todelete->color) {
-	    delete todelete;
-	    parent->right = todelete->right;
-	    if (todelete->right->color) {
-	      todelete->color = false;
+	else {//Calls check delete then delets
+	  checkDelete(temp, root);
+	  temp->parent->right = NULL;
+	}
+	newptr = NULL;
+      }
+      else if (temp->left != NULL && temp->right == NULL) {//If temp only has a left child
+	//MAKEs THE PARENTS POINTER POINT TO THE CHILD (EASIER)
+	node* tempParent = temp->parent;
+	if (tempParent->left == temp) {
+	  if (temp->left->isred == !temp->isred) {//If isreds are diffrent
+	    tempParent->left = temp->left;
+	    temp->left->parent = tempParent;
+	    if (temp->left->isred) {//Sets temps left new isred based on what the isred variations are
+	      temp->left->isred = false;
 	    }
+	    else {
+	      temp->left->isred = true;
+	    }
+	    delete temp;
 	    return;
 	  }
-	  parent->right = todelete->right;
-	  checkdlt(todelete, root, todelete);
-	} else {
-	  if (todelete->left->color == !todelete->color) {
-	    delete todelete;
-	    parent->right = todelete->left;
-	    if (todelete->left->color) {
-	      todelete->color = false;
+	  //Deletes temp
+	  tempParent->left = temp->left;
+	  temp->left->parent = tempParent;
+	  delete temp;
+	}
+	else {
+	  if (temp->left->isred == !temp->isred) {//If the isreds are diffrent
+	    tempParent->right = temp->left;
+	    temp->left->parent = tempParent;
+	    if (temp->left->isred) {//Sets temps left new isred based on the diffre isred variations
+	      temp->left->isred = false;
 	    }
+	    else {
+	      temp->left->isred = true;
+	    }
+	    delete temp;
 	    return;
 	  }
-	  parent->right = todelete->left;
-	  checkdlt(todelete, root, todelete);
+	  //Deletes temp
+	  tempParent->right = temp->left;
+	  temp->left->parent = tempParent;
+	  checkDelete(temp, root);
+	}
+	newptr = NULL;
+      }
+      else if (temp->left == NULL && temp->right != NULL) {//If temp only has a right child
+	node* tempParent = temp->parent;
+	if (tempParent->right == temp) {
+	  if (temp->right->isred == !temp->isred) {//If isreds are diffrent
+	    tempParent->right = temp->right;
+	    temp->right->parent = tempParent;
+	    if (temp->right->isred) {//Sets temp left based off isred varients
+	      temp->right->isred = false;
+	    }
+	    else {
+	      temp->right->isred = true;
+	    }
+	    delete temp;
+	    return;
+	  }
+	  //deletes temp then runs check delete
+	  tempParent->right = temp->right;
+	  temp->right->parent = tempParent;
+	  delete temp;
+	  checkDelete(temp, root);
+	}
+	else {
+	  if (temp->right->isred == !temp->isred) {
+	    tempParent->left = temp->right;
+	    temp->right->parent = tempParent;
+	    if (temp->right->isred) {
+	      temp->right->isred = false;
+	    }
+	    else {
+	      temp->right->isred = true;
+	    }
+	    delete temp;
+	    return;
+	  }
+	  tempParent->left = temp->right;
+	  temp->right->parent = tempParent;
+	  delete temp;
+	  checkDelete(temp, root);
+	}
+	newptr = NULL;
+      }
+      else {//If it has two children
+	node* newnode = temp->right;
+	while (newnode->left != NULL) {//Finds in order sucser
+	  newnode = newnode->left;
+	}
+	temp->data = newnode->data;
+	checkDelete(newnode, root);//Checks
+	if (newnode == temp->right) {
+	  temp->right = temp->right->right;
+	}
+	if (newnode->parent->left == newnode) {
+	  newnode->parent->left = NULL;
 	}
       }
-      return;
     }
   }
 }
 
-
-int tree::find(int input, node* &current, int& tester){
-  if(input == current->data || tester > 0){
-    cout << tester << endl;
-    tester++;
-    return tester;
-  }
-  if(input < current->data){
-    //less, left
-    if(current->left->data != 0){
-      find(input, current->left, tester);
-    }
-  }else if(input > current->data){
-    //high, right
-    if(current->right->data != 0){
-      find(input, current->right, tester);
-    }
-  }
-  if(current->left->data != 0 && current->right->data != 0){
-    cout << tester << endl;
-    return tester;
-  }
-  return tester;
-}
 
 void tree::checkadd(node* current, node*& root) {
   node* parent = NULL;

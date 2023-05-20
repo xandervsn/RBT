@@ -11,10 +11,11 @@
 
 int main(){
   tree bst;
+  node* newptr = NULL;
   srand(time(0));
 
   while(true){
-    cout << "Please enter a valid command (ADD, READ, PRINT, QUIT, DLT)." << endl;
+    cout << "Please enter a valid command (ADD, READ, PRINT, QUIT, FIND, DLT)." << endl;
     char command[10];
     int input = 0;
     cin >> command;
@@ -22,17 +23,13 @@ int main(){
       bst.display2(bst.root, bst.root, 0);
       bst.display(bst.root, 0);
     }else if(strcmp(command, "FIND") == 0){
-      cout << "What number to find?" << endl;
+      cout << "Input number to find:" << endl;
+      int input = 0;
       cin >> input;
-      if(bst.root){
-	int tester = 0;
-	if(bst.find(input, bst.root, tester) > 0){
-	  cout << "Number found" << endl;
-	}else{
-	  cout << "Number NOT found." << endl;
-	}
+      if(bst.search(bst.root, input, newptr)){
+	cout << "Input found!" << endl;
       }else{
-	cout << "This tree is empty!" << endl;
+	cout << "Input NOT found." << endl;
       }
     }if(strcmp(command, "ADD") == 0){
       cout << "Input number to add:" << endl;
@@ -105,16 +102,10 @@ int main(){
     }else if(strcmp(command, "QUIT") == 0){
       break;
     }else if(strcmp(command, "DLT") == 0){
-      node* todelete;
-      cout << "Input number to delete:" << endl;
+      cout << "Input number to remove:" << endl;
       int input = 0;
       cin >> input;
-      int tester = 0;
-      if(bst.find(input, bst.root, tester) > 0 && bst.root){
-	dlt(bst.root, todelete);
-      }else{
-	cout << "This number is not contained in the tree!" << endl;
-      }
+      bst.remove(bst.root, bst.root, input, newptr);
     }
   }
   return 0;
