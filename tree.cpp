@@ -159,6 +159,32 @@ bool tree::find(node* curr, int num, node* &n){
 }
 
 void tree::checkdelete(node* curr, node* &root){
+  //case 5 rewrite
+  if(!needsr(curr)){
+    cout << "cur:" << curr->data << endl;
+    curr->parent->right = NULL;
+    if(curr->isred && !curr->left && !curr->right){
+      if(!curr->parent->left){
+      	recolor(root, 0);
+      }
+    }else if(curr->left){
+      if(curr->left->isred){
+        cout << "hww" << endl;
+        curr->left->isred = false;
+        curr->parent->right = curr->left;
+      }
+    }else if(!curr->left && !curr->right){
+      if(!curr->isred && curr->parent->left){
+	if(!curr->parent->left->isred){
+	  cout << "awoo:" << curr->parent->right->data << endl;
+	  curr->parent->right->isred = true;
+	  curr->parent->isred = false;
+	}
+      }
+    }
+    return;
+  }
+  
   //double black finder
   node* sibling = NULL;
   if(!curr->parent){
@@ -325,175 +351,7 @@ void tree::checkdelete(node* curr, node* &root){
 }
 
 
-void tree::remove(node* &root, node* curr, int num, node* n){
-  if(find(curr, num, n) == true){
-    node* temp = n;
-    node* newPos = NULL;
-    node* x = NULL;
-    if(temp == root){
-      //ROOT CASE
-      if(temp->left == NULL && temp->right == NULL){
-	root = NULL;
-	n = NULL;
-      }else if(temp->left != NULL && temp->right == NULL){
-	//LEFT CHILD
-	root = root->left;
-	root->parent = NULL;
-	n = NULL;
-	newPos = root;
-      }else if(temp->left == NULL && temp->right != NULL){
-	//RIGHT CHILD
-	root = root->right;
-	root->parent = NULL;
-	n = NULL;
-	newPos = root;
-      }else {
-	//2 CHILDREN
-	node* newnode = temp->right;
-	while (newnode->left != NULL){
-	  newnode = newnode->left;
-	}
-	temp->data = newnode->data;
-	checkdelete(newnode, root);
-	if(newnode == temp->right){
-	  temp->right = temp->right->right;
-	}else if(newnode->right != NULL){
-	  newnode->parent->left = newnode->right;
-	  newnode->right->parent = newnode->parent;
-	  if(newnode->parent->isred){
-	    newnode->right->isred = false;
-	  }
-	}
-	if(newnode->parent->left == newnode){
-	  newnode->parent->left = NULL;
-	}
-	n = NULL;
-	newPos = root;
-      }
-    }else {
-      if(temp->left == NULL && temp->right == NULL){
-	//LEAF
-	if(temp->isred == true){
-	  if(temp->parent->left == temp){
-	    temp->parent->left = NULL;
-	    delete temp;
-	  }else {
-	    temp->parent->right = NULL;
-	    delete temp;
-	  }
-	  return;
-	}
-	if(temp->parent->left == temp){
-	  checkdelete(temp, root);
-	  temp->parent->left = NULL;
-	}else {
-	  checkdelete(temp, root);
-	  temp->parent->right = NULL;
-	}
-	n = NULL;
-      }else if(temp->left != NULL && temp->right == NULL){
-	//swaps parent, bit hacky (supposed to rotate) but i cba
-	//kinda just bst add but weirder
-	node* tempParent = temp->parent;
-	if(tempParent->left == temp){
-	  if(temp->left->isred == !temp->isred){
-	    tempParent->left = temp->left;
-	    temp->left->parent = tempParent;
-	    if(temp->left->isred){
-	      temp->left->isred = false;
-	    }else {
-	      temp->left->isred = true;
-	    }
-	    delete temp;
-	    return;
-	  }
-	  tempParent->left = temp->left;
-	  temp->left->parent = tempParent;
-	  delete temp;
-	}else {
-	  if(temp->left->isred == !temp->isred){
-	    tempParent->right = temp->left;
-	    temp->left->parent = tempParent;
-	    if(temp->left->isred){
-	      temp->left->isred = false;
-	    }else {
-	      temp->left->isred = true;
-	    }
-	    delete temp;
-	    return;
-	  }
-	  tempParent->right = temp->left;
-	  temp->left->parent = tempParent;
-	  checkdelete(temp, root);
-	}
-	n = NULL;
-      }else if(temp->left == NULL && temp->right != NULL){
-	node* tempParent = temp->parent;
-	if(tempParent->right == temp){
-	  if(temp->right->isred == !temp->isred){
-	    tempParent->right = temp->right;
-	    temp->right->parent = tempParent;
-	    if(temp->right->isred){
-	      temp->right->isred = false;
-	    }else {
-	      temp->right->isred = true;
-	    }
-	    delete temp;
-	    return;
-	  }
-	  tempParent->right = temp->right;
-	  temp->right->parent = tempParent;
-	  delete temp;
-	  checkdelete(temp, root);
-	}else {
-	  if(temp->right->isred == !temp->isred){
-	    tempParent->left = temp->right;
-	    temp->right->parent = tempParent;
-	    if(temp->right->isred){
-	      temp->right->isred = false;
-	    }else {
-	      temp->right->isred = true;
-	    }
-	    delete temp;
-	    return;
-	  }
-	  tempParent->left = temp->right;
-	  temp->right->parent = tempParent;
-	  delete temp;
-	  checkdelete(temp, root);
-	}
-	n = NULL;
-      }else {
-	node* newnode = temp->left;
-    	while(newnode->right != NULL){
-	  newnode = newnode->right;
-    	}
- 
-    	if(newnode->isred && newnode->parent->left == NULL){
-	  //cout << "a1" << endl;
-	  temp->data = newnode->data;
-	  newnode->parent->right = NULL;
-	  delete newnode;
-	  recolor(root, 0);
-	}else{
-	  //cout << "a2" << endl;
-	  newnode = temp->right;
-	  while(newnode->left != NULL){
-	    newnode = newnode->left;
-	  }
-	  temp->data = newnode->data;
-	  checkdelete(newnode, root);
-	  if(newnode == temp->right){
-	    temp->right = temp->right->right;
-	  }
-	  if(newnode->parent->left == newnode){
-	    newnode->parent->left = NULL;
-	  }
-	}
-      }
-    }
-  }
-}
+
 
 void tree::display(node* root, int buffer){
   //buffer is the space between nodes when printed out

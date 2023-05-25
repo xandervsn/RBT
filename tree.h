@@ -28,6 +28,7 @@ public:
   void add(node*&, node*, int, node*&);
   void checkadd(node*&, node*);
   void recolor(node*, int);
+  bool needsr(node*);
 };
 
 
