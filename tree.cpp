@@ -464,21 +464,31 @@ void tree::remove(node* &root, node* curr, int num, node* n){
 	}
 	n = NULL;
       }else {
-	//2 CHILDREN
-	node* newnode = temp->right;
-	while(newnode->left != NULL){
-	  newnode = newnode->left;
-	}
-	temp->data = newnode->data;
-
-	cout << newnode->isred << endl;
-    
-	checkdelete(newnode, root);
-	if(newnode == temp->right){
-	  temp->right = temp->right->right;
-	}
-	if(newnode->parent->left == newnode){
-	  newnode->parent->left = NULL;
+	node* newnode = temp->left;
+    	while(newnode->right != NULL){
+	  newnode = newnode->right;
+    	}
+ 
+    	if(newnode->isred && newnode->parent->left == NULL){
+	  //cout << "a1" << endl;
+	  temp->data = newnode->data;
+	  newnode->parent->right = NULL;
+	  delete newnode;
+	  recolor(root, 0);
+	}else{
+	  //cout << "a2" << endl;
+	  newnode = temp->right;
+	  while(newnode->left != NULL){
+	    newnode = newnode->left;
+	  }
+	  temp->data = newnode->data;
+	  checkdelete(newnode, root);
+	  if(newnode == temp->right){
+	    temp->right = temp->right->right;
+	  }
+	  if(newnode->parent->left == newnode){
+	    newnode->parent->left = NULL;
+	  }
 	}
       }
     }
@@ -508,6 +518,27 @@ void tree::display(node* root, int buffer){
   }
   display(root->left, buffer);
 }
+
+void tree::recolor(node* curr, int steps){
+  if(curr->right){
+    steps++;
+    recolor(curr->right, steps);
+    steps--;
+  }
+  if(curr->left){
+    steps++;
+    recolor(curr->left, steps);
+    steps--;
+  }
+  if(steps % 2 != 0){
+    cout << "R" << curr->data << endl;
+    curr->isred = true;
+  }else{
+    curr->isred = false;
+    cout << "B" << curr->data << endl;
+  }
+}
+
 
 tree::tree(){
  

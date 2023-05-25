@@ -27,6 +27,7 @@ public:
   bool find(node*, int, node*&);
   void add(node*&, node*, int, node*&);
   void checkadd(node*&, node*);
+  void recolor(node*, int);
 };
 
 

@@ -85,7 +85,7 @@ int main(){
 	} 	 
       }else if(strcmp(command, "RAND") == 0){
 	for(int i = 0; i < input; i++){
-	  int rnd = rand() % input;
+	  int rnd = rand() % numbers.size();
 	  int random = numbers[rnd];
 	  if(root == NULL){
 	    root = new node();
