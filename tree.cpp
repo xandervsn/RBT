@@ -531,11 +531,11 @@ void tree::recolor(node* curr, int steps){
     steps--;
   }
   if(steps % 2 != 0){
-    cout << "R" << curr->data << endl;
+    //cout << "R" << curr->data << endl;
     curr->isred = true;
   }else{
     curr->isred = false;
-    cout << "B" << curr->data << endl;
+    //cout << "B" << curr->data << endl;
   }
 }
 
